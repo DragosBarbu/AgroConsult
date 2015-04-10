@@ -4,9 +4,15 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
-import android.content.ContentResolver;
+import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -24,7 +30,11 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.agro.gusutri.agroconsult.model.Dao;
+import com.agro.gusutri.agroconsult.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,18 +45,13 @@ import java.util.List;
  */
 public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
+
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
-
+    private User currentUser;
+    private Dao dao = Dao.getInstance();
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -139,7 +144,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password,this);
             mAuthTask.execute((Void) null);
         }
     }
@@ -252,33 +257,31 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         private final String mEmail;
         private final String mPassword;
+        private final Context mContext;
 
-        UserLoginTask(String email, String password) {
+        UserLoginTask(String email, String password,Context context) {
             mEmail = email;
             mPassword = password;
+            mContext=context;
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
+            //return false because the password is wrong
+            //return true if correct or you want to register a new user
 
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
+            currentUser= dao.getExistingUser(mEmail);
+            if(currentUser.getId()!=-1)
+                if(currentUser.getPassword().equals(mPassword))
+                    return true;
+                else
+                    return false;
+            else
+            {
+                //user does not exist, set password with the password typed
+                currentUser.setPassword(mPassword);
+                return true;
             }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
-            return true;
         }
 
         @Override
@@ -287,7 +290,16 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             showProgress(false);
 
             if (success) {
-                finish();
+                if(currentUser.getId()!=-1) {
+                    finish();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    Bundle bundle= new Bundle();
+                    bundle.putParcelable(Dao.USER,currentUser);
+                    intent.putExtras(bundle);
+                    LoginActivity.this.startActivity(intent);
+                }
+                else
+                    showRegisterDialog();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -299,7 +311,42 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mAuthTask = null;
             showProgress(false);
         }
+
+        private static final int FRAGMENT_CONTENT_VIEW_ID = 10101010;
+
+        private void showRegisterDialog(){
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which){
+                        case DialogInterface.BUTTON_POSITIVE:
+                            FrameLayout frame = new FrameLayout(mContext);
+                            frame.setId(R.id.content_register_fragment);
+                            setContentView(frame, new FrameLayout.LayoutParams(
+                                    FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+
+
+                            Fragment registerFragment= new RegisterFragment();
+                            FragmentTransaction ft=getFragmentManager().beginTransaction();
+                            ft.add(R.id.content_register_fragment,registerFragment).commit();
+                            break;
+
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            mEmailView.setError(getString(R.string.error_invalid_email));
+                            mEmailView.requestFocus();
+                            break;
+                    }
+                }
+            };
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.mContext);
+            builder.setMessage(R.string.action_confirm_registry).setPositiveButton(R.string.yes, dialogClickListener)
+                    .setNegativeButton(R.string.no, dialogClickListener).show();
+        }
     }
+
+
+
 }
 
 
