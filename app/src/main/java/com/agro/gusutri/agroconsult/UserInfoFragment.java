@@ -6,8 +6,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import com.agro.gusutri.agroconsult.model.Dao;
 
 import java.util.ArrayList;
 
@@ -16,22 +17,25 @@ import java.util.ArrayList;
  */
 public class UserInfoFragment extends Fragment {
 
-    public UserInfoFragment(){}
+    private Dao dao=Dao.getInstance();
+    public static final int USER_INFO_LIST=0;
+
+    public UserInfoFragment() {
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView=inflater.inflate(R.layout.fragment_user_info, container, false);
-
-        ListView listView= (ListView) rootView.findViewById(R.id.user_info_list);
-        ArrayList<String> x= new ArrayList<>();
-        x.add("a");x.add("b");x.add("C");x.add("D");x.add("sda");x.add("asdfsd");x.add("sdef");
-
-        ArrayAdapter<String> itemsAdapter =
-                new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, x);
+        View rootView = inflater.inflate(R.layout.fragment_user_info, container, false);
 
 
-        listView.setAdapter(itemsAdapter);
+        ListView listView = (ListView) rootView.findViewById(R.id.user_info_list);
+        ArrayList tasks = dao.getTasks();
+        ItemListAdapter itemListAdapter = new ItemListAdapter(getActivity(),tasks,USER_INFO_LIST);
+        listView.setAdapter(itemListAdapter);
+
 
         return rootView;
     }
+
+
 }

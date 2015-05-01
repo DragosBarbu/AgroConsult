@@ -144,7 +144,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password,this);
+            mAuthTask = new UserLoginTask(email, password, this);
             mAuthTask.execute((Void) null);
         }
     }
@@ -258,11 +258,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         private final String mEmail;
         private final String mPassword;
         private final Context mContext;
+        private int statusCode;
 
-        UserLoginTask(String email, String password,Context context) {
+        UserLoginTask(String email, String password, Context context) {
             mEmail = email;
             mPassword = password;
-            mContext=context;
+            mContext = context;
         }
 
         @Override
@@ -270,7 +271,18 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             //return false because the password is wrong
             //return true if correct or you want to register a new user
 
-            currentUser= dao.getExistingUser(mEmail);
+            currentUser = dao.getExistingUser(mEmail, mPassword);
+            if (currentUser.getId() == -401) {
+                statusCode = 401;
+                return false;
+            }
+            if (currentUser.getId() == -404) {
+                statusCode = 404;
+                return true;
+            }
+            statusCode = 200;
+            return true;
+            /*
             if(currentUser.getId()!=-1)
                 if(currentUser.getPassword().equals(mPassword))
                     return true;
@@ -281,7 +293,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 //user does not exist, set password with the password typed
                 currentUser.setPassword(mPassword);
                 return true;
-            }
+            }*/
         }
 
         @Override
@@ -290,15 +302,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             showProgress(false);
 
             if (success) {
-                if(currentUser.getId()!=-1) {
+                if (statusCode==200){//currentUser.getId() != -1) {
                     finish();
                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    Bundle bundle= new Bundle();
-                    bundle.putParcelable(Dao.USER,currentUser);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(Dao.USER, currentUser);
                     intent.putExtras(bundle);
                     LoginActivity.this.startActivity(intent);
-                }
-                else
+                } else
                     showRegisterDialog();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -314,11 +325,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         private static final int FRAGMENT_CONTENT_VIEW_ID = 10101010;
 
-        private void showRegisterDialog(){
+        private void showRegisterDialog() {
             DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    switch (which){
+                    switch (which) {
                         case DialogInterface.BUTTON_POSITIVE:
                             FrameLayout frame = new FrameLayout(mContext);
                             frame.setId(R.id.content_register_fragment);
@@ -326,9 +337,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                                     FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
 
 
-                            Fragment registerFragment= new RegisterFragment();
-                            FragmentTransaction ft=getFragmentManager().beginTransaction();
-                            ft.add(R.id.content_register_fragment,registerFragment).commit();
+                            Fragment registerFragment = new RegisterFragment();
+                            FragmentTransaction ft = getFragmentManager().beginTransaction();
+                            ft.add(R.id.content_register_fragment, registerFragment).commit();
                             break;
 
                         case DialogInterface.BUTTON_NEGATIVE:
@@ -344,7 +355,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     .setNegativeButton(R.string.no, dialogClickListener).show();
         }
     }
-
 
 
 }

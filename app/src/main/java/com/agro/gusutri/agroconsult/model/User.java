@@ -8,24 +8,22 @@ import android.os.Parcelable;
  */
 public class User implements Parcelable {
 
-    private int id;
+    private int userId;
     private String name;
     private String email;
-    private String password;
 
-    public User(int id, String name, String email, String password) {
-        this.id = id;
+    public User(int userId, String name, String email) {
+        this.userId = userId;
         this.name = name;
         this.email = email;
-        this.password = password;
     }
 
     public int getId() {
-        return id;
+        return userId;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.userId= id;
     }
 
     public String getName() {
@@ -44,20 +42,11 @@ public class User implements Parcelable {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
 
     protected User(Parcel in) {
-        id = in.readInt();
+        userId = in.readInt();
         name = in.readString();
         email = in.readString();
-        password = in.readString();
     }
 
     @Override
@@ -67,10 +56,9 @@ public class User implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
+        dest.writeInt(userId);
         dest.writeString(name);
         dest.writeString(email);
-        dest.writeString(password);
     }
 
     @SuppressWarnings("unused")

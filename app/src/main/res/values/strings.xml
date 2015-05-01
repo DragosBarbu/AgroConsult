@@ -5,6 +5,13 @@
     <string name="no">No</string>
 
     <!-- Main activity-->
-    <string name="main_tab_user">Statistics</string>
+    <string name="main_tab_user">Info</string>
+    <string name="main_tab_fields">Fields</string>
     <string name="main_tab_map">Map</string>
+
+    <!--User info tab-->
+    <string name="main_user_title_1">Tasks</string>
+    <string name="main_user_title_2">Statistics</string>
+    <string name="map_send_data">Send</string>
+    <string name="map_add_marker">Add Point</string>
 </resources>
