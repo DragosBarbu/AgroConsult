@@ -1,20 +1,14 @@
 package com.agro.gusutri.agroconsult.model;
 
-import android.util.Log;
-
+import com.agro.gusutri.agroconsult.Service.Service;
 import com.google.gson.Gson;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -22,52 +16,36 @@ import java.util.ArrayList;
  */
 public class Dao {
     private static Dao ourInstance = new Dao();
+    private Service.HTTPRequestHelper httpRequestHelper;
+
 
     public static final String USER = "user";
+    public static final String EMAIL = "email";
+    public static final String SERVER_URL = "http://46.101.148.54:8080/agroconsult/";
 
     public static Dao getInstance() {
         return ourInstance;
     }
 
     private Dao() {
+        httpRequestHelper = Service.HTTPRequestHelper.getInstance();
     }
 
     //Tries to retrieve the user from database else it returns an user with id=-1
     public User getExistingUser(String email, String password) {
-        //TODO: get user from DB
         User user = null;
+        String url = SERVER_URL + "login?email=" + email + "&pass=" + password;
 
-        String url = "http://46.101.148.54:8080/agroconsult/login?email="+email+"&pass="+password;
-
-        HttpClient httpclient = new DefaultHttpClient();
-
-        // Prepare a request object
-        HttpGet httpget = new HttpGet(url);
-        // Execute the request
-        HttpResponse response;
         try {
-            response = httpclient.execute(httpget);
-            // Examine the response status
-            Log.i("LoginResponse", response.getStatusLine().toString());
+            HttpResponse response = httpRequestHelper.request(url);
 
             switch (response.getStatusLine().getStatusCode()) {
 
                 case 200:
-                    // Get hold of the response entity
                     HttpEntity entity = response.getEntity();
-                    // If the response does not enclose an entity, there is no need
-                    // to worry about connection release
-
-                    if (entity != null) {
-
-                        // A Simple JSON Response Read
-                        InputStream stream = entity.getContent();
-                        String result = convertStreamToString(stream);
-                        // now you have the string representation of the HTML request
-                        Gson gson = new Gson();
-                        user = gson.fromJson(result, User.class);
-                        stream.close();
-                    }
+                    String result = EntityUtils.toString(entity);
+                    Gson gson = new Gson();
+                    user = gson.fromJson(result, User.class);
                     break;
                 case 404://user not existing
                     user = new User(-404, "N/A", "N/A");
@@ -75,18 +53,38 @@ public class Dao {
                 case 403://wrong password
                     user = new User(-401, "N/A", "N/A");
                     break;
-
             }
-
-
-        } catch (Exception e) {
-            Log.w("Connection exception", e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
+
         return user;
     }
 
-    public void createUser(User user) {
-        //TODO: add user to DB
+    public User registerUser(User user, String password) {
+        String url = SERVER_URL+"register?email=" + user.getEmail()+ "&pass=" + password+"&username="+user.getName();
+        try {
+            HttpResponse response = httpRequestHelper.request(url);
+            switch (response.getStatusLine().getStatusCode()) {
+
+                case 200:
+                    HttpEntity entity = response.getEntity();
+                    String result = EntityUtils.toString(entity);
+                    //TODO setID!
+                    user.setId(1);
+                    break;
+                case 500://user not registered
+                    user = new User(-1, "N/A", "N/A");
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return user;
     }
 
     public ArrayList<Task> getTasks() {
@@ -130,25 +128,5 @@ public class Dao {
         return fields;
     }
 
-    private static String convertStreamToString(InputStream is) {
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        StringBuilder sb = new StringBuilder();
-
-        String line = null;
-        try {
-            while ((line = reader.readLine()) != null) {
-                sb.append(line + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return sb.toString();
-    }
 }

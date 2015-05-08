@@ -3,6 +3,9 @@
 
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
 
     <!-- Main activity-->
     <string name="main_tab_user">Info</string>
@@ -14,4 +17,12 @@
     <string name="main_user_title_2">Statistics</string>
     <string name="map_send_data">Send</string>
     <string name="map_add_marker">Add Point</string>
+    <string name="map_error_few_points">Add at least 3 points</string>
+    <string name="action_settings">settings</string>
+    <string name="action_map_settings_field">Add Field</string>
+    <string name="action_map_settings_problem">Report a field problem</string>
+    <string name="action_confirm_image_required">Do you want to add a picture?</string>
+    <string name="alert_hint_category_problem">Problem type</string>
+    <string name="alert_hint_details">Additional details</string>
+    <string name="alert_error">Please add both problem type and details</string>
 </resources>

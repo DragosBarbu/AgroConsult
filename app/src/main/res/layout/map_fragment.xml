@@ -15,8 +15,10 @@
         android:layout_alignParentTop="true"
         map:mapType="hybrid" />
     <LinearLayout
+        android:id="@+id/map_linear_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/button_material_light"
         android:orientation="horizontal">
         <Button
             android:layout_width="0dp"
@@ -31,4 +33,12 @@
             android:text="@string/map_add_marker"
             android:layout_height="wrap_content" />
         </LinearLayout>
+    <Button
+        android:id="@+id/map_button_report_problem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/action_map_settings_problem"
+        android:background="@color/background_material_light"
+        android:visibility="gone"
+        />
 </LinearLayout>

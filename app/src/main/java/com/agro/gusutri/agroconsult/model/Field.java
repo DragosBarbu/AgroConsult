@@ -7,9 +7,10 @@ public class Field {
 
     private long id;
     private String name;
-    private int perimeter,surface;
+    private int perimeter;
+    private float surface;
 
-    public Field(long id, String name, int surface, int perimeter) {
+    public Field(long id, String name, float surface, int perimeter) {
         this.id = id;
         this.name = name;
         this.surface = surface;
@@ -40,11 +41,11 @@ public class Field {
         this.perimeter = perimeter;
     }
 
-    public int getSurface() {
+    public float getSurface() {
         return surface;
     }
 
-    public void setSurface(int surface) {
+    public void setSurface(float surface) {
         this.surface = surface;
     }
 }

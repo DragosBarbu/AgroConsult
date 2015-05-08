@@ -6,7 +6,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.Context;
@@ -33,7 +32,10 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.agro.gusutri.agroconsult.Service.SQSProducer;
 import com.agro.gusutri.agroconsult.model.Dao;
+import com.agro.gusutri.agroconsult.Service.Service;
+import com.agro.gusutri.agroconsult.model.Field;
 import com.agro.gusutri.agroconsult.model.User;
 
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private UserLoginTask mAuthTask = null;
     private User currentUser;
     private Dao dao = Dao.getInstance();
+    private Service service=Service.getInstance();
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -83,6 +86,10 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                //TODO delete
+
+
                 attemptLogin();
             }
         });
@@ -119,7 +126,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!TextUtils.isEmpty(password) && !service.isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -130,7 +137,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
+        } else if (!service.isEmailValid(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -149,15 +156,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         }
     }
 
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
 
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
-    }
 
     /**
      * Shows the progress UI and hides the login form.
@@ -271,6 +270,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             //return false because the password is wrong
             //return true if correct or you want to register a new user
 
+
             currentUser = dao.getExistingUser(mEmail, mPassword);
             if (currentUser.getId() == -401) {
                 statusCode = 401;
@@ -281,6 +281,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 return true;
             }
             statusCode = 200;
+
+
+
             return true;
             /*
             if(currentUser.getId()!=-1)
@@ -338,7 +341,11 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
 
                             Fragment registerFragment = new RegisterFragment();
+                            Bundle bundle=new Bundle();
+                            bundle.putString(Dao.EMAIL,mEmail);
+                            registerFragment.setArguments(bundle);
                             FragmentTransaction ft = getFragmentManager().beginTransaction();
+
                             ft.add(R.id.content_register_fragment, registerFragment).commit();
                             break;
 
