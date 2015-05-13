@@ -37,7 +37,7 @@ public class SQSProducer {
 
         String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
 
-        ProblemEventSQSMessage message = new ProblemEventSQSMessage(encodedImage, problemEvent.getDate(), problemEvent.getDetails(), problemEvent.getCategoryName(), problemEvent.getField().getId(), problemEvent.getLocation().latitude, problemEvent.getLocation().longitude);
+        ProblemEventSQSMessage message = new ProblemEventSQSMessage(encodedImage, problemEvent.getDate(), problemEvent.getDetails(), problemEvent.getCategoryName(), problemEvent.getField().getFieldID(), problemEvent.getLocation().latitude, problemEvent.getLocation().longitude,problemEvent.getRadius());
 
         String json = gson.toJson(message);
 
@@ -54,8 +54,9 @@ public class SQSProducer {
         private String encodedImage;
         double latitude;
         double longitude;
+        double radius;
 
-        private ProblemEventSQSMessage(String encodedImage, Date date, String details, String categoryName, long fieldId, double longitude, double latitude) {
+        private ProblemEventSQSMessage(String encodedImage, Date date, String details, String categoryName, long fieldId, double longitude, double latitude,double radius) {
             this.date = date;
             this.details = details;
             this.categoryName = categoryName;
@@ -63,6 +64,8 @@ public class SQSProducer {
             this.longitude = longitude;
             this.latitude = latitude;
             this.encodedImage = encodedImage;
+            this.radius=radius;
+
         }
     }
 }

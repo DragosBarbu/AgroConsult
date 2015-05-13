@@ -7,9 +7,6 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.agro.gusutri.agroconsult.FieldFragment;
-import com.agro.gusutri.agroconsult.R;
-import com.agro.gusutri.agroconsult.UserInfoFragment;
 import com.agro.gusutri.agroconsult.model.Field;
 import com.agro.gusutri.agroconsult.model.Task;
 
@@ -80,9 +77,9 @@ public class ItemListAdapter extends BaseAdapter {
                 break;
             case FieldFragment.FIELD_LIST:
                 Field field = (Field) items.get(position);
-                viewHolder.txtTitle.setText(field.getName());
-                viewHolder.txtSubtitle.setText(field.getId() + "");
-                viewHolder.txtRightSubtitle.setText(field.getSurface() + " ha");
+                viewHolder.txtTitle.setText(field.getSirupCode());
+                viewHolder.txtSubtitle.setText(field.getCrop().getCropType() + "");
+                viewHolder.txtRightSubtitle.setText(field.getArea() + " ha");
                 break;
         }
 

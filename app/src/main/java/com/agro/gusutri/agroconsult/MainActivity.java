@@ -20,7 +20,7 @@ import com.agro.gusutri.agroconsult.model.User;
 public class MainActivity extends FragmentActivity {
 
     private FragmentTabHost mTabHost;
-    private User user;
+    public static User user;
 
     public static final int REQUEST_CODE_IMAGE_CAPTURE=1;
 

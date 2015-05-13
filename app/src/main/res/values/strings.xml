@@ -25,4 +25,8 @@
     <string name="alert_hint_category_problem">Problem type</string>
     <string name="alert_hint_details">Additional details</string>
     <string name="alert_error">Please add both problem type and details</string>
+    <string name="map_new_problem_marker">Problem location</string>
+    <string name="map_increase_radius">+</string>
+    <string name="map_decrease_radius">-</string>
+    <string name="map_error_no_problem_location">Add a location first</string>
 </resources>

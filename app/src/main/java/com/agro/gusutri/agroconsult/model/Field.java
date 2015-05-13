@@ -5,47 +5,66 @@ package com.agro.gusutri.agroconsult.model;
  */
 public class Field {
 
-    private long id;
-    private String name;
-    private int perimeter;
-    private float surface;
+    private int fieldID;
+    private User user;
+    private double perimeter, area;
+    private String sirupCode;
+    private Crop crop;
 
-    public Field(long id, String name, float surface, int perimeter) {
-        this.id = id;
-        this.name = name;
-        this.surface = surface;
+    public Field(int fieldID, User user, double perimeter, double area, String sirupCode, Crop crop) {
+        this.fieldID = fieldID;
+        this.user = user;
         this.perimeter = perimeter;
+        this.area = area;
+        this.sirupCode = sirupCode;
+        this.crop = crop;
     }
 
-    public long getId() {
-        return id;
+    public int getFieldID() {
+        return fieldID;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setFieldID(int fieldID) {
+        this.fieldID = fieldID;
     }
 
-    public String getName() {
-        return name;
+    public User getUser() {
+        return user;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public int getPerimeter() {
+    public double getPerimeter() {
         return perimeter;
     }
 
-    public void setPerimeter(int perimeter) {
+    public void setPerimeter(double perimeter) {
         this.perimeter = perimeter;
     }
 
-    public float getSurface() {
-        return surface;
+    public double getArea() {
+        return area;
     }
 
-    public void setSurface(float surface) {
-        this.surface = surface;
+    public void setArea(double area) {
+        this.area = area;
+    }
+
+    public String getSirupCode() {
+        return sirupCode;
+    }
+
+    public void setSirupCode(String sirupCode) {
+        this.sirupCode = sirupCode;
+    }
+
+    public Crop getCrop() {
+        return crop;
+    }
+
+    public void setCrop(Crop crop) {
+        this.crop = crop;
     }
 }

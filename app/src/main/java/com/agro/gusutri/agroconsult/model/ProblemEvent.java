@@ -13,17 +13,19 @@ public class ProblemEvent {
 
     private Bitmap image;
     private Date date;
-    private String details,categoryName;
+    private String details, categoryName;
     private Field field;
-    LatLng location;
+    private LatLng location;
+    private double radius;
 
-    public ProblemEvent(Bitmap image, Date date, String details, Field field, String categoryName, LatLng location) {
+    public ProblemEvent(Bitmap image, Date date, String details, Field field, String categoryName, LatLng location, Double radius) {
         this.image = image;
         this.date = date;
         this.details = details;
         this.field = field;
         this.categoryName = categoryName;
         this.location = location;
+        this.radius = radius;
     }
 
     public Date getDate() {
@@ -72,5 +74,13 @@ public class ProblemEvent {
 
     public void setLocation(LatLng location) {
         this.location = location;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public void setRadius(double radius) {
+        this.radius = radius;
     }
 }

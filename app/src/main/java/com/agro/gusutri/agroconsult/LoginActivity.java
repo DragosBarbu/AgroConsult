@@ -280,23 +280,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 statusCode = 404;
                 return true;
             }
-            statusCode = 200;
+           statusCode = 200;
 
 
 
             return true;
-            /*
-            if(currentUser.getId()!=-1)
-                if(currentUser.getPassword().equals(mPassword))
-                    return true;
-                else
-                    return false;
-            else
-            {
-                //user does not exist, set password with the password typed
-                currentUser.setPassword(mPassword);
-                return true;
-            }*/
+
         }
 
         @Override
@@ -338,7 +327,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                             frame.setId(R.id.content_register_fragment);
                             setContentView(frame, new FrameLayout.LayoutParams(
                                     FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
-
 
                             Fragment registerFragment = new RegisterFragment();
                             Bundle bundle=new Bundle();

@@ -6,6 +6,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -22,11 +23,12 @@ public class Service {
 
     private static Service instance;
 
-    private Service (){}
+    private Service() {
+    }
 
-    public static Service getInstance(){
-        if(instance==null)
-            instance=new Service();
+    public static Service getInstance() {
+        if (instance == null)
+            instance = new Service();
         return instance;
     }
 
@@ -40,18 +42,17 @@ public class Service {
         return password.length() > 4;
     }
 
-    public float calculateArea(List<LatLng> points){
+    public float calculateArea(List<LatLng> points) {
 
-        int nrOfPoints=points.size();
-        float sum_but_no_result=0;
+        int nrOfPoints = points.size();
+        float sum_but_no_result = 0;
 
-        for(int i=0;i<(nrOfPoints-1);i++)
-        {
-            sum_but_no_result+=points.get(i).latitude*points.get(i+1).longitude + points.get(i).longitude*points.get(i+1).latitude;
+        for (int i = 0; i < (nrOfPoints - 1); i++) {
+            sum_but_no_result += points.get(i).latitude * points.get(i + 1).longitude + points.get(i).longitude * points.get(i + 1).latitude;
         }
-        sum_but_no_result+=points.get(nrOfPoints-1).latitude*points.get(0).longitude + points.get(nrOfPoints-1).longitude*points.get(0).latitude;
+        sum_but_no_result += points.get(nrOfPoints - 1).latitude * points.get(0).longitude + points.get(nrOfPoints - 1).longitude * points.get(0).latitude;
 
-        float sum= Math.abs(sum_but_no_result) / 2.0f;
+        float sum = Math.abs(sum_but_no_result) / 2.0f;
         return sum;
     }
 
@@ -84,7 +85,7 @@ public class Service {
             }
         }
 
-        public HttpResponse request(String url)
+        public HttpResponse requestPOST(String url)
                 throws ClientProtocolException, IOException, IllegalStateException,
                 JSONException {
 
@@ -97,6 +98,22 @@ public class Service {
                 Log.i("LoginResponse", response.getStatusLine().toString());
                 return response;
             }
+        }
+
+        public HttpResponse requestGET(String url)
+                throws ClientProtocolException, IOException, IllegalStateException,
+                JSONException {
+
+            synchronized (instance) {
+
+                DefaultHttpClient client = new DefaultHttpClient();
+                HttpGet get = new HttpGet(url);
+                get.addHeader("Cache-Control", "no-cache");
+                HttpResponse response = client.execute(get);
+                Log.i("LoginResponse", response.getStatusLine().toString());
+                return response;
+            }
+
         }
     }
 }

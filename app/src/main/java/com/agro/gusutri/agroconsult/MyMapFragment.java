@@ -33,6 +33,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -50,8 +52,11 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
     private View view;
     private GoogleMap mMap;
     private FragmentManager fragmentManager;
-    private LinearLayout linearButtons;
-    private Button btnReportProblem;
+    private LinearLayout linearFieldsButtons, linearProblemButtons;
+    private Marker problemMarkerLocation = null;
+    private Circle problemCircleLocation = null;
+    private GoogleMap.OnMapClickListener myMapClickListener = null;
+
 
     private Service service = Service.getInstance();
 
@@ -117,7 +122,7 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
                     float area = service.calculateArea(fieldMap.getPoints());
                     Toast.makeText(MyMapFragment.this.getActivity(), area + " mp?", Toast.LENGTH_LONG).show();
 
-                    resetFieldsOnMap();
+                    resetMap();
 
                 } else {
                     Toast.makeText(MyMapFragment.this.getActivity(), getString(R.string.map_error_few_points), Toast.LENGTH_LONG).show();
@@ -125,8 +130,12 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        linearButtons = (LinearLayout) view.findViewById(R.id.map_linear_buttons);
-        btnReportProblem = (Button) view.findViewById(R.id.map_button_report_problem);
+        // Problem sending code
+        linearFieldsButtons = (LinearLayout) view.findViewById(R.id.map_linear_fields_buttons);
+        linearProblemButtons = (LinearLayout) view.findViewById(R.id.map_linear_problems_buttons);
+        Button btnReportProblem = (Button) view.findViewById(R.id.map_button_report_problem);
+        Button btnIncreaseRadius = (Button) view.findViewById(R.id.map_button_increase_radius);
+        Button btnDecreaseRadius = (Button) view.findViewById(R.id.map_button_decrease_radius);
 
         btnReportProblem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,16 +144,46 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        btnIncreaseRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (problemCircleLocation != null) {
+                    double radius = problemCircleLocation.getRadius();
+                    problemCircleLocation.setRadius(radius + 10);
+                } else
+                    Toast.makeText(getActivity(), getString(R.string.map_error_no_problem_location), Toast.LENGTH_LONG).show();
+            }
+        });
+        btnDecreaseRadius.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (problemCircleLocation != null) {
+                    double radius = problemCircleLocation.getRadius();
+                    if (radius > 10) {
+
+                        problemCircleLocation.setRadius(radius - 10);
+                    }
+                } else
+                    Toast.makeText(getActivity(), getString(R.string.map_error_no_problem_location), Toast.LENGTH_LONG).show();
+            }
+        });
+
         return view;
     }
 
-    private void resetFieldsOnMap() {
-        //reset markers
-        points = new ArrayList<Marker>();
+    private void resetMap() {
         mMap.clear();
-        //add existing fields
-        for (PolygonOptions x : fields) {
-            mMap.addPolygon(x);
+        if (mapOption == true) {
+            //reset markers
+            points = new ArrayList<Marker>();
+            //add existing fields
+            for (PolygonOptions x : fields) {
+                mMap.addPolygon(x);
+            }
+        } else {
+            problemMarkerLocation = null;
+            problemCircleLocation=null;
+
         }
     }
 
@@ -224,19 +263,46 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
 
     private void changeMapSettings(MenuItem item) {
         mapOption = !mapOption;
+        resetMap();
+        //map clickListener
+        if (myMapClickListener == null)
+            myMapClickListener = new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    if (problemMarkerLocation == null)
+                        problemMarkerLocation = mMap.addMarker(new MarkerOptions()
+                                .position(latLng)
+                                .title(getString(R.string.map_new_problem_marker)));
+                    else
+                        problemMarkerLocation.setPosition(latLng);
+
+                    if (problemCircleLocation == null)
+                        problemCircleLocation = mMap.addCircle(new CircleOptions()
+                                .center(latLng)
+                                .radius(10));
+                    else
+                        problemCircleLocation.setCenter(latLng);
+                }
+            };
 
         if (mapOption == false) {
+            //change visibility settings
             item.setIcon(getResources().getDrawable(R.drawable.ic_action_add_field));
             item.setTitle(getString(R.string.action_map_settings_field));
 
-            btnReportProblem.setVisibility(View.VISIBLE);
-            linearButtons.setVisibility(View.GONE);
+            linearProblemButtons.setVisibility(View.VISIBLE);
+            linearFieldsButtons.setVisibility(View.GONE);
+            //change onMapClickListener
+            mMap.setOnMapClickListener(myMapClickListener);
         } else {
+            //change visibility settings
             item.setIcon(getResources().getDrawable(R.drawable.ic_action_send_problem));
             item.setTitle(getString(R.string.action_map_settings_problem));
 
-            btnReportProblem.setVisibility(View.GONE);
-            linearButtons.setVisibility(View.VISIBLE);
+            linearProblemButtons.setVisibility(View.GONE);
+            linearFieldsButtons.setVisibility(View.VISIBLE);
+            //change onMapClickListener
+            mMap.setOnMapClickListener(null);
         }
     }
 
@@ -249,11 +315,13 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
 
                 Date date = new Date();
                 String details = mDetails;
-                Field field = new Field(23, "fieldd", 234, 23);
+                int fieldID=7;
+                Field field = new Field(fieldID,MainActivity.user, 0,0, "sirupcode",null);
                 String categoryName = mCategoryProblem;
-                LatLng location = new LatLng(4, 5);
+                LatLng location = problemCircleLocation.getCenter();
+                Double radius=problemCircleLocation.getRadius();
 
-                ProblemEvent problemEvent = new ProblemEvent(imageBitmap, date, details, field, categoryName, location);
+                ProblemEvent problemEvent = new ProblemEvent(imageBitmap, date, details, field, categoryName, location,radius);
 
                 ReportProblemAsyncTask r = new ReportProblemAsyncTask();
                 r.execute(problemEvent);

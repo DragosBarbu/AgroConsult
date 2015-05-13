@@ -5,40 +5,69 @@
     android:orientation="vertical">
 
 
-    <fragment
-        xmlns:map="http://schemas.android.com/apk/res-auto"
+    <fragment xmlns:map="http://schemas.android.com/apk/res-auto"
         android:id="@+id/location_map"
         class="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_alignParentTop="true"
+        android:layout_weight="1"
         map:mapType="hybrid" />
+
     <LinearLayout
-        android:id="@+id/map_linear_buttons"
+        android:id="@+id/map_linear_fields_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/button_material_light"
         android:orientation="horizontal">
+
         <Button
-            android:layout_width="0dp"
             android:id="@+id/map_button_send_data"
-            android:text="@string/map_send_data"
-            android:layout_weight="1"
-            android:layout_height="wrap_content" />
-        <Button
             android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:text="@string/map_send_data" />
+
+        <Button
             android:id="@+id/map_button_add_marker"
-            android:text="@string/map_add_marker"
-            android:layout_height="wrap_content" />
-        </LinearLayout>
-    <Button
-        android:id="@+id/map_button_report_problem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/map_add_marker" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/map_linear_problems_buttons"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/action_map_settings_problem"
-        android:background="@color/background_material_light"
-        android:visibility="gone"
-        />
+        android:background="@color/button_material_light"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/map_button_increase_radius"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/map_increase_radius" />
+
+            <Button
+                android:id="@+id/map_button_decrease_radius"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/map_decrease_radius" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/map_button_report_problem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/action_map_settings_problem" />
+    </LinearLayout>
 </LinearLayout>
