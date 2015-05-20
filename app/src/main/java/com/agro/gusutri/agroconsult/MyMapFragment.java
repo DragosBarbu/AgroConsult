@@ -27,8 +27,10 @@ import android.widget.Toast;
 
 import com.agro.gusutri.agroconsult.Service.SQSProducer;
 import com.agro.gusutri.agroconsult.Service.Service;
+import com.agro.gusutri.agroconsult.model.Dao;
 import com.agro.gusutri.agroconsult.model.Field;
 import com.agro.gusutri.agroconsult.model.ProblemEvent;
+import com.agro.gusutri.agroconsult.model.User;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,6 +45,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.ArrayList;
 import java.util.Date;
+
 
 /**
  * Created by dragos on 4/20/15.
@@ -95,6 +98,7 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
             ((SupportMapFragment) fragmentManager.findFragmentById(R.id.location_map)).getMapAsync(this);
         }
 
+
         final Button btnAddLocation = (Button) view.findViewById(R.id.map_button_add_marker);
         btnAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,17 +116,26 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onClick(View v) {
                 if (points.size() > 2) {
+
+                    ArrayList<com.agro.gusutri.agroconsult.model.Location> locations = new ArrayList<com.agro.gusutri.agroconsult.model.Location>();
+                    //create polygon to be added to map
                     PolygonOptions polygonOptions = new PolygonOptions().strokeColor(Color.BLUE).fillColor(Color.argb(50, 162, 23, 23));
-                    for (Marker m : points) {
-                        polygonOptions.add(m.getPosition());
+                    for (int i = 0; i < points.size(); i++) {
+                        Marker m = points.get(i);
+                        LatLng position = m.getPosition();
+                        polygonOptions.add(position);
+
+                        locations.add(new com.agro.gusutri.agroconsult.model.Location(position.latitude, position.longitude, "x:" + i));
                     }
                     fields.add(polygonOptions);
-                    Polygon fieldMap = mMap.addPolygon(polygonOptions);
-
-                    float area = service.calculateArea(fieldMap.getPoints());
-                    Toast.makeText(MyMapFragment.this.getActivity(), area + " mp?", Toast.LENGTH_LONG).show();
-
                     resetMap();
+
+                    Intent intent = new Intent(getActivity(), RegisterFieldActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelableArrayList(Dao.LOCATIONS, locations);
+                    bundle.putParcelable(Dao.USER, MainActivity.user);
+                    intent.putExtras(bundle);
+                    getActivity().startActivity(intent);
 
                 } else {
                     Toast.makeText(MyMapFragment.this.getActivity(), getString(R.string.map_error_few_points), Toast.LENGTH_LONG).show();
@@ -177,13 +190,14 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
             //reset markers
             points = new ArrayList<Marker>();
             //add existing fields
-            for (PolygonOptions x : fields) {
-                mMap.addPolygon(x);
-            }
+
         } else {
             problemMarkerLocation = null;
-            problemCircleLocation=null;
+            problemCircleLocation = null;
 
+        }
+        for (PolygonOptions x : fields) {
+            mMap.addPolygon(x);
         }
     }
 
@@ -229,6 +243,9 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
 
             }
         });
+        //fill map with fields
+        GetFieldsAsyncTask task = new GetFieldsAsyncTask();
+        task.execute(MainActivity.user);
     }
 
     @Override
@@ -269,19 +286,23 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
             myMapClickListener = new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
-                    if (problemMarkerLocation == null)
-                        problemMarkerLocation = mMap.addMarker(new MarkerOptions()
-                                .position(latLng)
-                                .title(getString(R.string.map_new_problem_marker)));
-                    else
-                        problemMarkerLocation.setPosition(latLng);
+                    Field field = service.getFieldOfLocation(fieldArrayList, latLng);
+                    if (field != null) {
+                        if (problemMarkerLocation == null)
+                            problemMarkerLocation = mMap.addMarker(new MarkerOptions()
+                                    .position(latLng)
+                                    .title(getString(R.string.map_new_problem_marker)));
+                        else
+                            problemMarkerLocation.setPosition(latLng);
 
-                    if (problemCircleLocation == null)
-                        problemCircleLocation = mMap.addCircle(new CircleOptions()
-                                .center(latLng)
-                                .radius(10));
-                    else
-                        problemCircleLocation.setCenter(latLng);
+                        if (problemCircleLocation == null)
+                            problemCircleLocation = mMap.addCircle(new CircleOptions()
+                                    .center(latLng)
+                                    .radius(10));
+                        else
+                            problemCircleLocation.setCenter(latLng);
+                    } else
+                        Toast.makeText(getActivity(), "Put marker on a field", Toast.LENGTH_LONG).show();
                 }
             };
 
@@ -315,13 +336,14 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
 
                 Date date = new Date();
                 String details = mDetails;
-                int fieldID=7;
-                Field field = new Field(fieldID,MainActivity.user, 0,0, "sirupcode",null);
                 String categoryName = mCategoryProblem;
                 LatLng location = problemCircleLocation.getCenter();
-                Double radius=problemCircleLocation.getRadius();
+                Double radius = problemCircleLocation.getRadius();
 
-                ProblemEvent problemEvent = new ProblemEvent(imageBitmap, date, details, field, categoryName, location,radius);
+                Field field = service.getFieldOfLocation(fieldArrayList, location);//new Field(fieldID, MainActivity.user, 0, 0, "sirupcode", null, null);
+
+
+                ProblemEvent problemEvent = new ProblemEvent(imageBitmap, date, details, field, categoryName, location, radius);
 
                 ReportProblemAsyncTask r = new ReportProblemAsyncTask();
                 r.execute(problemEvent);
@@ -346,24 +368,35 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which) {
-                    case DialogInterface.BUTTON_POSITIVE:
-                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                        mDetails = txtDetails.getText().toString();
-                        mCategoryProblem = txtCategory.getText().toString();
-                        if (!(mDetails.equals("") || mCategoryProblem.equals(""))) {
+                mDetails = txtDetails.getText().toString();
+                mCategoryProblem = txtCategory.getText().toString();
+                if (!(mDetails.equals("") || mCategoryProblem.equals(""))) {
+
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                             if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                                 startActivityForResult(takePictureIntent, MainActivity.REQUEST_CODE_IMAGE_CAPTURE);
                             }
-                        } else
-                            Toast.makeText(getActivity(), getString(R.string.alert_error), Toast.LENGTH_LONG).show();
-                        break;
+                            break;
 
-                    case DialogInterface.BUTTON_NEGATIVE:
-                        ReportProblemAsyncTask r2 = new ReportProblemAsyncTask();
-                        r2.execute();
-                        break;
-                }
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            Date date = new Date();
+                            String details = mDetails;
+                            String categoryName = mCategoryProblem;
+                            LatLng location = problemCircleLocation.getCenter();
+                            Double radius = problemCircleLocation.getRadius();
+
+                            Field field = service.getFieldOfLocation(fieldArrayList, location);//new Field(fieldID, MainActivity.user, 0, 0, "sirupcode", null, null);
+
+                            ProblemEvent problemEvent = new ProblemEvent(null, date, details, field, categoryName, location, radius);
+
+                            ReportProblemAsyncTask r2 = new ReportProblemAsyncTask();
+                            r2.execute(problemEvent);
+                            break;
+                    }
+                } else
+                    Toast.makeText(getActivity(), getString(R.string.alert_error), Toast.LENGTH_LONG).show();
             }
         };
         dialogBuilder.setMessage(R.string.action_confirm_image_required).setPositiveButton(R.string.yes, dialogClickListener)
@@ -393,5 +426,29 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
                 Toast.makeText(getActivity(), "ERROR: Problem NOT reported", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private ArrayList<Field> fieldArrayList;
+
+    private class GetFieldsAsyncTask extends AsyncTask<User, Void, Void> {
+
+        @Override
+        protected Void doInBackground(User[] params) {
+            fieldArrayList = Dao.getInstance().getFields(params[0].getId());
+            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            for (Field f : fieldArrayList) {
+                PolygonOptions polygonOptions = new PolygonOptions().strokeColor(Color.BLUE).fillColor(Color.argb(50, 162, 23, 23));
+                for (com.agro.gusutri.agroconsult.model.Location l : f.getLocations()) {
+                    polygonOptions.add(new LatLng(l.getLatitude(), l.getLongitude()));
+                }
+                fields.add(polygonOptions);
+            }
+            resetMap();
+        }
     }
 }

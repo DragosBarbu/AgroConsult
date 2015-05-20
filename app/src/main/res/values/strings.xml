@@ -29,4 +29,16 @@
     <string name="map_increase_radius">+</string>
     <string name="map_decrease_radius">-</string>
     <string name="map_error_no_problem_location">Add a location first</string>
+
+
+    <!-- Register field -->
+    <string name="register_field_send">Send to server</string>
+    <string name="register_field_select_stage">Select the stage of the crop</string>
+    <string-array name="array_crop_stages">
+        <item>None</item>
+        <item>Planting preparations</item>
+        <item>Planted</item>
+        <item>Maintenance</item>
+        <item>Harvested</item>
+    </string-array>
 </resources>

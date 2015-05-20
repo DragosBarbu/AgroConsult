@@ -49,8 +49,20 @@
             android:name=".MainActivity"
             android:screenOrientation="portrait"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize|stateVisible" >
+            >
         </activity>
+        <activity
+            android:name=".FieldDetailsActivity"
+            android:screenOrientation="portrait"
+            android:label="@string/app_name"
+            >
+        </activity>
+        <activity
+        android:name=".RegisterFieldActivity"
+        android:screenOrientation="portrait"
+        android:label="@string/app_name"
+        android:windowSoftInputMode="adjustResize|stateVisible" >
+    </activity>
     </application>
 
 </manifest>

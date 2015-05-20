@@ -32,12 +32,13 @@ public class SQSProducer {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         Bitmap bitmap = problemEvent.getImage();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
-        byte[] b = outputStream.toByteArray();
-
-        String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
-
-        ProblemEventSQSMessage message = new ProblemEventSQSMessage(encodedImage, problemEvent.getDate(), problemEvent.getDetails(), problemEvent.getCategoryName(), problemEvent.getField().getFieldID(), problemEvent.getLocation().latitude, problemEvent.getLocation().longitude,problemEvent.getRadius());
+        String encodedImage ="";
+        if (bitmap != null) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+            byte[] b = outputStream.toByteArray();
+            encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+        }
+        ProblemEventSQSMessage message = new ProblemEventSQSMessage(encodedImage, problemEvent.getDate(), problemEvent.getDetails(), problemEvent.getCategoryName(), problemEvent.getField().getFieldID(), problemEvent.getLocation().latitude, problemEvent.getLocation().longitude, problemEvent.getRadius());
 
         String json = gson.toJson(message);
 
@@ -56,7 +57,7 @@ public class SQSProducer {
         double longitude;
         double radius;
 
-        private ProblemEventSQSMessage(String encodedImage, Date date, String details, String categoryName, long fieldId, double longitude, double latitude,double radius) {
+        private ProblemEventSQSMessage(String encodedImage, Date date, String details, String categoryName, long fieldId, double longitude, double latitude, double radius) {
             this.date = date;
             this.details = details;
             this.categoryName = categoryName;
@@ -64,7 +65,7 @@ public class SQSProducer {
             this.longitude = longitude;
             this.latitude = latitude;
             this.encodedImage = encodedImage;
-            this.radius=radius;
+            this.radius = radius;
 
         }
     }

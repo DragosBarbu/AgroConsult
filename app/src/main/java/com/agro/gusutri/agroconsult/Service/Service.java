@@ -1,19 +1,24 @@
 package com.agro.gusutri.agroconsult.Service;
 
+import android.location.LocationManager;
 import android.util.Log;
 
+import com.agro.gusutri.agroconsult.model.Field;
+import com.agro.gusutri.agroconsult.model.Location;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,20 +47,87 @@ public class Service {
         return password.length() > 4;
     }
 
-    public float calculateArea(List<LatLng> points) {
+    public float calculateArea(List<Location> points) {
 
         int nrOfPoints = points.size();
         float sum_but_no_result = 0;
 
         for (int i = 0; i < (nrOfPoints - 1); i++) {
-            sum_but_no_result += points.get(i).latitude * points.get(i + 1).longitude + points.get(i).longitude * points.get(i + 1).latitude;
+            sum_but_no_result += points.get(i).getLatitude() * points.get(i + 1).getLongitude() + points.get(i).getLongitude() * points.get(i + 1).getLatitude();
         }
-        sum_but_no_result += points.get(nrOfPoints - 1).latitude * points.get(0).longitude + points.get(nrOfPoints - 1).longitude * points.get(0).latitude;
+        sum_but_no_result += points.get(nrOfPoints - 1).getLatitude() * points.get(0).getLongitude() + points.get(nrOfPoints - 1).getLongitude() * points.get(0).getLatitude();
 
         float sum = Math.abs(sum_but_no_result) / 2.0f;
         return sum;
     }
 
+    public double calculatePerimeter(List<Location> locations) {
+
+        double perimeter = 0;
+        for (int i = 1; i < locations.size(); i++) {
+            perimeter += distanceBetween(locations.get(i - 1), locations.get(i));
+        }
+        perimeter += distanceBetween(locations.get(locations.size() - 1), locations.get(0));
+        return perimeter;
+
+    }
+
+    private float distanceBetween(Location l1, Location l2) {
+
+        android.location.Location loc1 = new android.location.Location(LocationManager.GPS_PROVIDER);
+        android.location.Location loc2 = new android.location.Location(LocationManager.GPS_PROVIDER);
+
+        loc1.setLatitude(l1.getLatitude());
+        loc1.setLongitude(l1.getLongitude());
+
+        loc2.setLatitude(l2.getLatitude());
+        loc2.setLongitude(l2.getLongitude());
+        return loc1.distanceTo(loc2);
+    }
+
+    public Field getFieldOfLocation(ArrayList<Field> fields, LatLng location) {
+        for (Field f : fields) {
+            ArrayList<LatLng> vertices = new ArrayList<>();
+            for (Location l : f.getLocations()) {
+                vertices.add(new LatLng(l.getLatitude(), l.getLongitude()));
+            }
+            if (isPointInPolygon(location, vertices))
+                return f;
+        }
+
+        return null;
+    }
+
+    private boolean isPointInPolygon(LatLng tap, ArrayList<LatLng> vertices) {
+        int intersectCount = 0;
+        for (int j = 0; j < vertices.size() - 1; j++) {
+            if (rayCastIntersect(tap, vertices.get(j), vertices.get(j + 1))) {
+                intersectCount++;
+            }
+        }
+
+        return ((intersectCount % 2) == 1); // odd = inside, even = outside;
+    }
+
+    private boolean rayCastIntersect(LatLng tap, LatLng pointA, LatLng pointB) {
+
+        double aY = pointA.latitude;
+        double bY = pointB.latitude;
+        double aX = pointA.longitude;
+        double bX = pointB.longitude;
+        double pY = tap.latitude;
+        double pX = tap.longitude;
+
+        if ((aY > pY && bY > pY) || (aY < pY && bY < pY) || (aX < pX && bX < pX)) {
+            return false; // a and b can't both be above or below pt.y, and a or b must be east of pt.x
+        }
+
+        double m = (aY - bY) / (aX - bX);               // Rise over run
+        double bee = (-aX) * m + aY;                // y = mx + b
+        double x = (pY - bee) / m;                  // algebra is neat!
+
+        return x > pX;
+    }
 
     public static class HTTPRequestHelper {
 
@@ -70,7 +142,7 @@ public class Service {
             return instance;
         }
 
-        public HttpResponse request(String url, JSONObject request)
+        public HttpResponse requestPOST(String url, String content)
                 throws ClientProtocolException, IOException, IllegalStateException,
                 JSONException {
 
@@ -78,7 +150,9 @@ public class Service {
 
                 DefaultHttpClient client = new DefaultHttpClient();
                 HttpPost post = new HttpPost(url);
-                post.setEntity(new StringEntity(request.toString(), "utf-8"));
+
+                byte[] bytes = content.getBytes("UTF-8");
+                post.setEntity(new ByteArrayEntity(bytes));
                 HttpResponse response = client.execute(post);
                 Log.i("LoginResponse", response.getStatusLine().toString());
                 return response;
@@ -92,6 +166,7 @@ public class Service {
             synchronized (instance) {
 
                 DefaultHttpClient client = new DefaultHttpClient();
+
                 HttpPost post = new HttpPost(url);
                 post.addHeader("Cache-Control", "no-cache");
                 HttpResponse response = client.execute(post);

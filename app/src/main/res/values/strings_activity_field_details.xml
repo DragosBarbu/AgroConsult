@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="field_details_sirup">SIRUP:</string>
+    <string name="field_details_area">Surface</string>
+    <string name="field_details_perimeter">Perimeter</string>
+    <string name="field_details_crop_type">Crop</string>
+    <string name="field_details_crop_stage">Stage</string>
+    <string name="field_details_crop_date_planted">Date planted</string>
+    <string name="field_details_crop_date_harvested">Date harvested</string>
+    <string name="field_details_crop_preferred">Future crops indicated</string>
+    <string name="field_details_crop_not_indicated">Future crops NOT indicated</string>
+
+</resources>

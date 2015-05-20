@@ -6,9 +6,9 @@ import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -18,12 +18,14 @@ import java.util.ArrayList;
  * Created by dragos on 4/7/15.
  */
 public class Dao {
+    public static final String FIELD = "field";
     private static Dao ourInstance = new Dao();
     private Service.HTTPRequestHelper httpRequestHelper;
 
 
     public static final String USER = "user";
     public static final String EMAIL = "email";
+    public static final String LOCATIONS = "locations";
     public static final String SERVER_URL = "http://46.101.190.175:8080/agroconsult/";
 
     public static Dao getInstance() {
@@ -130,7 +132,8 @@ public class Dao {
                     HttpEntity entity = response.getEntity();
                     String result = EntityUtils.toString(entity);
                     Gson gson = new Gson();
-                    Type listType = new TypeToken<ArrayList<Field>>() {}.getType();
+                    Type listType = new TypeToken<ArrayList<Field>>() {
+                    }.getType();
                     fields = gson.fromJson(result, listType);
                     break;
             }
@@ -145,4 +148,30 @@ public class Dao {
     }
 
 
+    public String registerField(Field field) {
+        String success = "q";
+        String url = SERVER_URL + "registerfield";
+        Gson gson= new Gson();
+        String json=gson.toJson(field);
+
+
+        try {
+            HttpResponse response = httpRequestHelper.requestPOST(url,json);
+            switch (response.getStatusLine().getStatusCode()) {
+
+                case 200:
+                    HttpEntity entity = response.getEntity();
+                    String result = EntityUtils.toString(entity);
+                    success = result;
+                    break;
+                default:
+                    success = "error";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return success;
+    }
 }

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/field_details_sirup_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/main_tab_fields"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/field_details_sirup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/field_details_sirup"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/darker_gray" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/field_details_perimeter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/field_details_perimeter" />
+
+        <TextView
+            android:id="@+id/field_details_perimeter_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_gravity="right"
+            android:text="New Text" />
+
+        <TextView
+            android:id="@+id/field_details_area"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/field_details_perimeter"
+            android:text="@string/field_details_area" />
+
+        <TextView
+            android:id="@+id/field_details_area_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/field_details_perimeter_value"
+            android:layout_gravity="right"
+            android:text="New Text" />
+
+        <TextView
+            android:id="@+id/field_details_crop_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/field_details_area"
+            android:text="@string/field_details_crop_type" />
+
+        <TextView
+            android:id="@+id/field_details_crop_type_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/field_details_area_value"
+            android:layout_gravity="right"
+            android:text="New Text" />
+
+        <TextView
+            android:id="@+id/field_details_crop_stage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/field_details_crop_type"
+            android:text="@string/field_details_crop_stage" />
+
+        <TextView
+            android:id="@+id/field_details_crop_stage_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/field_details_crop_type_value"
+            android:layout_gravity="right"
+            android:text="New Text" />
+
+        <TextView
+            android:id="@+id/field_details_crop_date_planted"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/field_details_crop_stage"
+            android:text="@string/field_details_crop_date_planted" />
+
+        <TextView
+            android:id="@+id/field_details_crop_date_planted_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/field_details_crop_stage_value"
+            android:layout_gravity="right"
+            android:text="New Text" />
+
+        <TextView
+            android:id="@+id/field_details_crop_date_harvested"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/field_details_crop_date_planted"
+            android:text="@string/field_details_crop_date_harvested" />
+
+        <TextView
+            android:id="@+id/field_details_crop_date_harvested_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/field_details_crop_date_planted_value"
+            android:layout_gravity="right"
+            android:text="New Text" />
+
+
+        <TextView
+            android:id="@+id/field_details_crop_preferred"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/field_details_crop_date_harvested"
+            android:text="@string/field_details_crop_preferred" />
+
+        <TextView
+            android:id="@+id/field_details_crop_preferred_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/field_details_crop_date_harvested_value"
+            android:layout_gravity="right"
+            android:text="New Text" />
+        <TextView
+        android:id="@+id/field_details_crop_not_indicated"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/field_details_crop_preferred"
+        android:text="@string/field_details_crop_not_indicated" />
+
+        <TextView
+            android:id="@+id/field_details_crop_not_indicated_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/field_details_crop_preferred_value"
+            android:layout_gravity="right"
+            android:text="New Text" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@android:color/darker_gray" />
+
+
+</LinearLayout>

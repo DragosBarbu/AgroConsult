@@ -1,12 +1,15 @@
 package com.agro.gusutri.agroconsult;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.agro.gusutri.agroconsult.model.Dao;
 import com.agro.gusutri.agroconsult.model.Field;
 import com.agro.gusutri.agroconsult.model.Task;
 
@@ -19,10 +22,12 @@ public class ItemListAdapter extends BaseAdapter {
 
     private ArrayList items = new ArrayList<>();
     private LayoutInflater mInflater;
+    private Context mContext;
     private int listID;
 
     public ItemListAdapter(Context context, ArrayList items, int listType) {
         mInflater = LayoutInflater.from(context);
+        mContext=context;
         this.items = items;
         listID = listType;
     }
@@ -76,10 +81,21 @@ public class ItemListAdapter extends BaseAdapter {
                 viewHolder.txtRightSubtitle.setText(task.getId() + "");
                 break;
             case FieldFragment.FIELD_LIST:
-                Field field = (Field) items.get(position);
+                final Field field = (Field) items.get(position);
                 viewHolder.txtTitle.setText(field.getSirupCode());
                 viewHolder.txtSubtitle.setText(field.getCrop().getCropType() + "");
                 viewHolder.txtRightSubtitle.setText(field.getArea() + " ha");
+
+                convertView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(mContext, FieldDetailsActivity.class);
+                        Bundle bundle=new Bundle();
+                        bundle.putParcelable(Dao.FIELD,field);
+                        intent.putExtras(bundle);
+                        mContext.startActivity(intent);
+                    }
+                });
                 break;
         }
 
