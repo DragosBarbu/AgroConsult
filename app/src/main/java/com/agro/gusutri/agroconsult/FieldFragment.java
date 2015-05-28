@@ -14,15 +14,13 @@ import com.agro.gusutri.agroconsult.model.Dao;
 import com.agro.gusutri.agroconsult.model.Field;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by dragos on 4/16/15.
  */
 public class FieldFragment extends Fragment {
 
-    private Dao dao= Dao.getInstance();
-    public static final int FIELD_LIST=1;
+    private Dao dao = Dao.getInstance();
     private ListView rootView;
 
     public FieldFragment() {
@@ -31,29 +29,29 @@ public class FieldFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = new ListView(getActivity());
-        FieldsAsync f= new FieldsAsync(getActivity());
+        FieldsAsync f = new FieldsAsync(getActivity());
         f.execute();
         return rootView;
     }
 
-    public class FieldsAsync extends AsyncTask<Void,Void,ArrayList<Field>>
-    {
+    public class FieldsAsync extends AsyncTask<Void, Void, ArrayList<Field>> {
 
         private Context mContext;
 
-        public FieldsAsync(Context context){
-            mContext=context;
+        public FieldsAsync(Context context) {
+            mContext = context;
         }
+
         @Override
         protected ArrayList<Field> doInBackground(Void... params) {
-            return  dao.getFields(MainActivity.user.getId());
+            return dao.getFields(MainActivity.user.getId());
 
         }
 
         @Override
         protected void onPostExecute(ArrayList<Field> fields) {
-            ItemListAdapter itemListAdapter = new ItemListAdapter(mContext,fields,FIELD_LIST);
-            rootView.setAdapter(itemListAdapter);
+            FieldListAdapter fieldListAdapter = new FieldListAdapter(mContext, fields);
+            rootView.setAdapter(fieldListAdapter);
         }
     }
 }

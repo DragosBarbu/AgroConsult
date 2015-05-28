@@ -103,7 +103,7 @@ public class MyMapFragment extends Fragment implements OnMapReadyCallback {
         btnAddLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                btnAddLocation.setText(latitude + "-" + longitude);
+
                 LatLng newPoint = new LatLng(latitude, longitude);
                 Marker marker = mMap.addMarker(new MarkerOptions().position(newPoint).title(points.size() + ""));
                 marker.setDraggable(true);

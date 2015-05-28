@@ -37,7 +37,7 @@ public class FieldDetailsActivity extends Activity {
 
         txtSirup.setText(field.getSirupCode());
         txtPerimeter.setText(field.getPerimeter()+"");
-        txtArea.setText(field.getArea()+"");
+        txtArea.setText(String.format("%.2f", field.getArea()));
         txtCropType.setText(field.getCrop().getCropType());
         txtCropStage.setText(field.getCrop().getCropStage());
         txtCropPlanted.setText(field.getCrop().getDatePlanted());

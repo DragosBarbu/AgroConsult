@@ -2,17 +2,18 @@ package com.agro.gusutri.agroconsult.model;
 
 import com.agro.gusutri.agroconsult.Service.Service;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+
 
 /**
  * Created by dragos on 4/7/15.
@@ -92,31 +93,7 @@ public class Dao {
         return user;
     }
 
-    public ArrayList<Task> getTasks() {
-        //TODO: get task List fromDB
-        ArrayList<Task> tasks = new ArrayList<>();
 
-        Task t1 = new Task("Do something", "do it", 0);
-        Task t2 = new Task("Dance baby dance", "dance", 1);
-        Task t3 = new Task("Are you ready", "Ready?", 2);
-        tasks.add(t1);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t2);
-        tasks.add(t3);
-        return tasks;
-    }
 
     public ArrayList<Field> getFields(int userID) {
         ArrayList<Field> fields = new ArrayList<>();
@@ -173,5 +150,36 @@ public class Dao {
             e.printStackTrace();
         }
         return success;
+    }
+
+    public ArrayList<ProblemEvent> getProblemEvents(User user) {
+        ArrayList<ProblemEvent> events= new ArrayList<>();
+
+        String url = SERVER_URL + "solution?userid=" + user.getId();
+
+        try {
+            HttpResponse response = httpRequestHelper.requestGET(url);
+
+            switch (response.getStatusLine().getStatusCode()) {
+
+                case 200:
+                    HttpEntity entity = response.getEntity();
+                    String result = EntityUtils.toString(entity);
+                    Gson gson = new GsonBuilder()
+                            .setDateFormat("MM-dd-yyyy").create();
+                    Type listType = new TypeToken<ArrayList<ProblemEvent>>() {
+                    }.getType();
+                    events = gson.fromJson(result, listType);
+                    break;
+                default:
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return events;
     }
 }

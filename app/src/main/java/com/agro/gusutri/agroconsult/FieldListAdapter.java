@@ -18,18 +18,18 @@ import java.util.ArrayList;
 /**
  * Created by dragos on 4/16/15.
  */
-public class ItemListAdapter extends BaseAdapter {
+public class FieldListAdapter extends BaseAdapter {
 
     private ArrayList items = new ArrayList<>();
     private LayoutInflater mInflater;
     private Context mContext;
-    private int listID;
+    // private int listID;
 
-    public ItemListAdapter(Context context, ArrayList items, int listType) {
+    public FieldListAdapter(Context context, ArrayList items) {
         mInflater = LayoutInflater.from(context);
-        mContext=context;
+        mContext = context;
         this.items = items;
-        listID = listType;
+        // listID = listType;
     }
 
     @Override
@@ -58,11 +58,11 @@ public class ItemListAdapter extends BaseAdapter {
         ViewHolderItem viewHolder;
         if (convertView == null) {
 
-            convertView = mInflater.inflate(R.layout.row_user_info, null);
+            convertView = mInflater.inflate(R.layout.row_fields, null);
             viewHolder = new ViewHolderItem();
-            viewHolder.txtTitle = (TextView) convertView.findViewById(R.id.user_info_row_header);
-            viewHolder.txtSubtitle = (TextView) convertView.findViewById(R.id.user_info_row_sub_header);
-            viewHolder.txtRightSubtitle = (TextView) convertView.findViewById(R.id.user_info_row_surface);
+            viewHolder.txtTitle = (TextView) convertView.findViewById(R.id.row_field_header);
+            viewHolder.txtSubtitle = (TextView) convertView.findViewById(R.id.row_field_sub_header);
+            viewHolder.txtRightSubtitle = (TextView) convertView.findViewById(R.id.row_field_surface);
 
             convertView.setTag(viewHolder);
 
@@ -73,31 +73,28 @@ public class ItemListAdapter extends BaseAdapter {
 
         }
 
-        switch (listID) {
-            case UserInfoFragment.USER_INFO_LIST:
-                Task task = (Task) items.get(position);
-                viewHolder.txtTitle.setText(task.getTitle());
-                viewHolder.txtSubtitle.setText(task.getDescription() + "");
-                viewHolder.txtRightSubtitle.setText(task.getId() + "");
-                break;
-            case FieldFragment.FIELD_LIST:
-                final Field field = (Field) items.get(position);
-                viewHolder.txtTitle.setText(field.getSirupCode());
-                viewHolder.txtSubtitle.setText(field.getCrop().getCropType() + "");
-                viewHolder.txtRightSubtitle.setText(field.getArea() + " ha");
+        // switch (listID) {
+        //     case UserInfoFragment.USER_INFO_LIST:
 
-                convertView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(mContext, FieldDetailsActivity.class);
-                        Bundle bundle=new Bundle();
-                        bundle.putParcelable(Dao.FIELD,field);
-                        intent.putExtras(bundle);
-                        mContext.startActivity(intent);
-                    }
-                });
-                break;
-        }
+        //         break;
+        //     case FieldFragment.FIELD_LIST:
+        final Field field = (Field) items.get(position);
+        viewHolder.txtTitle.setText(field.getSirupCode());
+        viewHolder.txtSubtitle.setText(field.getCrop().getCropType() + "");
+        viewHolder.txtRightSubtitle.setText(String.format("%.2f", field.getArea()/10000 )+ " ha");
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(mContext, FieldDetailsActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable(Dao.FIELD, field);
+                intent.putExtras(bundle);
+                mContext.startActivity(intent);
+            }
+        });
+        //       break;
+        // }
 
 
         return convertView;

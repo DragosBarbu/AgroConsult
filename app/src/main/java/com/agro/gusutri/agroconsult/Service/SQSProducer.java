@@ -31,6 +31,7 @@ public class SQSProducer {
 
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
         Bitmap bitmap = problemEvent.getImage();
         String encodedImage ="";
         if (bitmap != null) {
@@ -38,6 +39,7 @@ public class SQSProducer {
             byte[] b = outputStream.toByteArray();
             encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
         }
+
         ProblemEventSQSMessage message = new ProblemEventSQSMessage(encodedImage, problemEvent.getDate(), problemEvent.getDetails(), problemEvent.getCategoryName(), problemEvent.getField().getFieldID(), problemEvent.getLocation().latitude, problemEvent.getLocation().longitude, problemEvent.getRadius());
 
         String json = gson.toJson(message);

@@ -12,6 +12,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.agro.gusutri.agroconsult.Service.AreaCalculator;
 import com.agro.gusutri.agroconsult.Service.Service;
 import com.agro.gusutri.agroconsult.model.Crop;
 import com.agro.gusutri.agroconsult.model.Dao;
@@ -53,9 +54,9 @@ public class RegisterFieldActivity extends Activity {
         final User user = bundle.getParcelable(Dao.USER);
         final ArrayList<Location> locations = bundle.getParcelableArrayList(Dao.LOCATIONS);
         final double perimeter = service.calculatePerimeter(locations);
-        final double area = service.calculateArea(locations);
-        txtPerimeter.setText(perimeter + "");
-        txtArea.setText(area + "");
+        final double area = AreaCalculator.getInstance().calculateAreaOfGPSPolygonOnEarthInSquareMeters(locations);
+        txtPerimeter.setText(perimeter + " m");
+        txtArea.setText(String.format("%.2f", area/10000 ) + " ha");
 
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,22 +81,23 @@ public class RegisterFieldActivity extends Activity {
 
     private class RegisterFieldAsyncTask extends AsyncTask<Field, Void, Boolean> {
 
-        String q;
+
 
         @Override
         protected Boolean doInBackground(Field... params) {
 
             Dao dao = Dao.getInstance();
-            q = dao.registerField(params[0]);
+            dao.registerField(params[0]);
             return true;
 
         }
 
         @Override
         protected void onPostExecute(Boolean success) {
-            if (success)
-                Toast.makeText(RegisterFieldActivity.this, q, Toast.LENGTH_LONG).show();
-            else
+            if (success) {
+                Toast.makeText(RegisterFieldActivity.this, "Field registered", Toast.LENGTH_LONG).show();
+                RegisterFieldActivity.this.finish();
+            }else
                 Toast.makeText(RegisterFieldActivity.this, "ERROR", Toast.LENGTH_LONG).show();
         }
 

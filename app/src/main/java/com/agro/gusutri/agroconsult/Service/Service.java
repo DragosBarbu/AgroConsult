@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.agro.gusutri.agroconsult.model.Field;
 import com.agro.gusutri.agroconsult.model.Location;
+import com.agro.gusutri.agroconsult.model.Solution;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.apache.http.HttpResponse;
@@ -124,9 +125,18 @@ public class Service {
 
         double m = (aY - bY) / (aX - bX);               // Rise over run
         double bee = (-aX) * m + aY;                // y = mx + b
-        double x = (pY - bee) / m;                  // algebra is neat!
+        double x = (pY - bee) / m;
 
         return x > pX;
+    }
+
+    public String getSolutionsAsString(ArrayList<Solution> solutions){
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i=1;i<=solutions.size();i++){
+            Solution s= solutions.get(i-1);
+            stringBuilder.append(i+". "+s.getName()+": "+s.getDetails()+"\n");
+        }
+        return stringBuilder.toString();
     }
 
     public static class HTTPRequestHelper {

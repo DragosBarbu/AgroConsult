@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -17,6 +18,7 @@ public class ProblemEvent {
     private Field field;
     private LatLng location;
     private double radius;
+    private ArrayList<Solution> solutions;
 
     public ProblemEvent(Bitmap image, Date date, String details, Field field, String categoryName, LatLng location, Double radius) {
         this.image = image;
@@ -82,5 +84,13 @@ public class ProblemEvent {
 
     public void setRadius(double radius) {
         this.radius = radius;
+    }
+
+    public ArrayList<Solution> getSolutions() {
+        return solutions;
+    }
+
+    public void setSolutions(ArrayList<Solution> solutions) {
+        this.solutions = solutions;
     }
 }
