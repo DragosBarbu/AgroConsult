@@ -21,8 +21,8 @@ public class SQSClient {
 
     private BasicAWSCredentials credentials;
     public static final String FIELD_QUEUE = "fieldProblemQueue";
-    private static final String accessKey = "AKIAIFT2GT232CD4RINQ";
-    private static final String secretKey = "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";
+    private static final String accessKey = "*******";
+    private static final String secretKey = "*******";
 
     private AmazonSQS sqs;
 
